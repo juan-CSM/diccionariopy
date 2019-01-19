@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-#falta: leer de json, ademas falta poder agregar multiples definiciones
-#y tratar de alguna forma a los argumentos que se pasen
 
 #importar
 import sys
 import json
 import os
+import difflib
 
 def capturar():
     palabra_agre = input("Que se va a definir: ")
@@ -33,9 +32,19 @@ if("e" in argumentos):
         json.dump(datos,diccio, indent = 2)
 elif("c" in argumentos):
     palabra = consultar()
+    palabra = palabra.lower()
     with open('diccionario.json', 'r') as diccio:
         datos = json.load(diccio)
         if(palabra in datos.keys()):
             print(f"{palabra}: {datos[palabra]}")
+        elif(palabra.upper() in datos.keys()):
+            print(f"{palabra}: {datos[palabra.upper()]}")
+        elif(palabra.capitalize() in datos.keys()):
+            print(f"{palabra}: {datos[palabra.capitalize()]}")
         else:
             print("palabra no encontrada")
+            similar = difflib.get_close_matches(palabra,datos.keys(),n = 3,cutoff = 0.6)
+            if(len(similar)!= 0):
+                print("sugerencias:")
+                for i in similar:
+                    print(f"{i}: {datos[i]}")
